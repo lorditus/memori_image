@@ -10,24 +10,23 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  // CONFIG
   final int totalRound = 5;
 
-  // STATE
   int currentRound = 0;
   int score = 0;
   bool isMemorizing = true;
 
   int memorizeIndex = 0;
   int timeLeft = 30;
+  int memorizeTimeLeft = 3;
 
   Timer? timer;
 
   List<String> images = [
-    'assets/images/city.jpeg',
-    'assets/images/earth.png',
-    'assets/images/hulk.jpeg',
-    'assets/images/mark.jpeg',
+    'assets/earth.png',
+    'assets/earth_2.png',
+    'assets/earth_3.png',
+    'assets/earth_4.png',
   ];
 
   late List<String> sequence;
@@ -49,24 +48,31 @@ class _GameScreenState extends State<GameScreen> {
     startMemorize();
   }
 
-  // ================= MEMORIZE =================
   void startMemorize() {
     isMemorizing = true;
     memorizeIndex = 0;
+    memorizeTimeLeft = 3;
 
-    timer = Timer.periodic(const Duration(seconds: 3), (t) {
+    timer?.cancel();
+
+    timer = Timer.periodic(const Duration(seconds: 1), (t) {
       setState(() {
-        memorizeIndex++;
+        memorizeTimeLeft--;
       });
 
-      if (memorizeIndex >= sequence.length) {
-        t.cancel();
-        startQuiz();
+      if (memorizeTimeLeft == 0) {
+        memorizeIndex++;
+
+        if (memorizeIndex >= sequence.length) {
+          t.cancel();
+          startQuiz();
+        } else {
+          memorizeTimeLeft = 3; // reset untuk gambar berikutnya
+        }
       }
     });
   }
 
-  // ================= QUIZ =================
   void startQuiz() {
     isMemorizing = false;
     currentRound = 0;
@@ -104,7 +110,7 @@ class _GameScreenState extends State<GameScreen> {
     timer?.cancel();
 
     if (selected == correctAnswer) {
-      score += timeLeft;
+      score += 1;
     }
 
     nextQuestion();
@@ -142,7 +148,6 @@ class _GameScreenState extends State<GameScreen> {
     super.dispose();
   }
 
-  // ================= UI =================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,8 +168,16 @@ class _GameScreenState extends State<GameScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text("Ingat gambar ini!"),
+        Text("Gambar ${memorizeIndex + 1}/${sequence.length}"),
+        const SizedBox(height: 10),
+
+        Text(
+          "$memorizeTimeLeft",
+          style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+        ),
+
         const SizedBox(height: 20),
+
         Image.asset(sequence[memorizeIndex], height: 150),
       ],
     );
