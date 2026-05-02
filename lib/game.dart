@@ -1,0 +1,203 @@
+import 'dart:async';
+import 'dart:math';
+import 'package:flutter/material.dart';
+
+class GameScreen extends StatefulWidget {
+  const GameScreen({super.key});
+
+  @override
+  State<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends State<GameScreen> {
+  // CONFIG
+  final int totalRound = 5;
+
+  // STATE
+  int currentRound = 0;
+  int score = 0;
+  bool isMemorizing = true;
+
+  int memorizeIndex = 0;
+  int timeLeft = 30;
+
+  Timer? timer;
+
+  List<String> images = [
+    'assets/images/city.jpeg',
+    'assets/images/earth.png',
+    'assets/images/hulk.jpeg',
+    'assets/images/mark.jpeg',
+  ];
+
+  late List<String> sequence;
+  late List<String> options;
+  late String correctAnswer;
+
+  @override
+  void initState() {
+    super.initState();
+    startGame();
+  }
+
+  void startGame() {
+    sequence = List.generate(
+      totalRound,
+      (_) => images[Random().nextInt(images.length)],
+    );
+
+    startMemorize();
+  }
+
+  // ================= MEMORIZE =================
+  void startMemorize() {
+    isMemorizing = true;
+    memorizeIndex = 0;
+
+    timer = Timer.periodic(const Duration(seconds: 3), (t) {
+      setState(() {
+        memorizeIndex++;
+      });
+
+      if (memorizeIndex >= sequence.length) {
+        t.cancel();
+        startQuiz();
+      }
+    });
+  }
+
+  // ================= QUIZ =================
+  void startQuiz() {
+    isMemorizing = false;
+    currentRound = 0;
+    loadQuestion();
+  }
+
+  void loadQuestion() {
+    if (currentRound >= totalRound) {
+      endGame();
+      return;
+    }
+
+    correctAnswer = sequence[currentRound];
+
+    options = List.from(images)..shuffle();
+
+    timeLeft = 30;
+
+    timer?.cancel();
+    timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      setState(() {
+        timeLeft--;
+      });
+
+      if (timeLeft <= 0) {
+        t.cancel();
+        nextQuestion();
+      }
+    });
+
+    setState(() {});
+  }
+
+  void selectAnswer(String selected) {
+    timer?.cancel();
+
+    if (selected == correctAnswer) {
+      score += timeLeft;
+    }
+
+    nextQuestion();
+  }
+
+  void nextQuestion() {
+    currentRound++;
+    loadQuestion();
+  }
+
+  void endGame() {
+    timer?.cancel();
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Game Finished"),
+        content: Text("Score: $score"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  // ================= UI =================
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Game"),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      body: Center(child: isMemorizing ? buildMemorize() : buildQuiz()),
+    );
+  }
+
+  Widget buildMemorize() {
+    if (memorizeIndex >= sequence.length) {
+      return const Text("Loading...");
+    }
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text("Ingat gambar ini!"),
+        const SizedBox(height: 20),
+        Image.asset(sequence[memorizeIndex], height: 150),
+      ],
+    );
+  }
+
+  Widget buildQuiz() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text("Round ${currentRound + 1}/$totalRound"),
+        const SizedBox(height: 10),
+        Text("Time: $timeLeft"),
+        const SizedBox(height: 20),
+
+        GridView.builder(
+          shrinkWrap: true,
+          itemCount: options.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+          ),
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () => selectAnswer(options[index]),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Image.asset(options[index]),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}

@@ -1,27 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memori_image/mainScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'mainScreen.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: const LoginScreen(),
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-    );
-  }
-}
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -38,12 +17,16 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _checkSavedLogin();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkSavedLogin();
+    });
   }
 
   Future<void> _checkSavedLogin() async {
     final prefs = await SharedPreferences.getInstance();
     _savedUsername = prefs.getString('username');
+
+    print("LOADED USERNAME: $_savedUsername");
 
     if (_savedUsername != null && _savedUsername!.isNotEmpty) {
       Navigator.pushReplacement(
@@ -52,13 +35,14 @@ class _LoginScreenState extends State<LoginScreen> {
           builder: (context) => MainScreen(username: _savedUsername!),
         ),
       );
+    } else {
+      setState(() => _isLoading = false);
     }
-
-    setState(() => _isLoading = false);
   }
 
   Future<void> _login() async {
     String name = _controller.text.trim();
+
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Username tidak boleh kosong')),
@@ -67,22 +51,24 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     final prefs = await SharedPreferences.getInstance();
+
     await prefs.setString('username', name);
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Login Success! $name')));
+    String? check = prefs.getString('username');
+    print("CHECK SETELAH SAVE: $check");
 
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => MainScreen(username: name)),
     );
-
-    _controller.clear();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(20),

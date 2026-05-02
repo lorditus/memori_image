@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memori_image/game.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login.dart';
 
@@ -27,7 +28,7 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Memorimage'),
-        backgroundColor: Colors.blue, 
+        backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
         actions: [
           IconButton(icon: const Icon(Icons.logout), onPressed: _logout),
@@ -37,7 +38,7 @@ class _MainScreenState extends State<MainScreen> {
         child: ListView(
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(color: Colors.blue), 
+              decoration: const BoxDecoration(color: Colors.blue),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -121,8 +122,9 @@ class _MainScreenState extends State<MainScreen> {
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Play Game - Belum')),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const GameScreen()),
                     );
                   },
                   child: const Text(
