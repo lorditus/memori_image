@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -121,14 +122,24 @@ class _GameScreenState extends State<GameScreen> {
     loadQuestion();
   }
 
-  void endGame() {
+  void endGame() async {
     timer?.cancel();
+
+    final prefs = await SharedPreferences.getInstance();
+
+    int highScore = prefs.getInt('highscore') ?? 0;
+
+    if (score > highScore) {
+      await prefs.setInt('highscore', score);
+    }
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text("Game Finished"),
-        content: Text("Score: $score"),
+        content: Text(
+          "Score: $score\nHigh Score: ${prefs.getInt('highscore')}",
+        ),
         actions: [
           TextButton(
             onPressed: () {
