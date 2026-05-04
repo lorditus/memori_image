@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memori_image/game.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login.dart';
+import 'highscore.dart';
 
 class MainScreen extends StatefulWidget {
   final String username;
@@ -56,8 +57,11 @@ class _MainScreenState extends State<MainScreen> {
               title: const Text('High Score'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('High Score - Belum')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HighScoreScreen(),
+                  ),
                 );
               },
             ),

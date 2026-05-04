@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'result.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -33,6 +34,7 @@ class _GameScreenState extends State<GameScreen> {
   late List<String> sequence;
   late List<String> options;
   late String correctAnswer;
+  List<String> leaderboard = [];
 
   @override
   void initState() {
@@ -123,35 +125,68 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void endGame() async {
-    timer?.cancel();
+  timer?.cancel();
 
-    final prefs = await SharedPreferences.getInstance();
+  final prefs = await SharedPreferences.getInstance();
 
-    int highScore = prefs.getInt('highscore') ?? 0;
+  String username = prefs.getString('username') ?? "Guest";
 
-    if (score > highScore) {
-      await prefs.setInt('highscore', score);
-    }
+  List<String> leaderboard = prefs.getStringList('leaderboard') ?? [];
 
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Game Finished"),
-        content: Text(
-          "Score: $score\nHigh Score: ${prefs.getInt('highscore')}",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-    );
+  leaderboard.add("$username|$score");
+
+  leaderboard.sort((a, b) {
+    int scoreA = int.parse(a.split('|')[1]);
+    int scoreB = int.parse(b.split('|')[1]);
+    return scoreB.compareTo(scoreA);
+  });
+
+  if (leaderboard.length > 3) {
+    leaderboard = leaderboard.sublist(0, 3);
   }
+
+  await prefs.setStringList('leaderboard', leaderboard);
+  await prefs.setInt('last_score', score);
+
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (_) => const ResultScreen()),
+  );
+}
+  // void endGame() async {
+  //   timer?.cancel();
+
+  //   final prefs = await SharedPreferences.getInstance();
+
+  //   int highScore = prefs.getInt('highscore') ?? 0;
+
+  //   if (score > highScore) {
+  //     await prefs.setInt('highscore', score);
+  //   }
+  //   await prefs.setInt('last_score', score);
+  //   Navigator.pushReplacement(
+  //     context,
+  //     MaterialPageRoute(builder: (_) => const ResultScreen()),
+  //   );
+  //   // showDialog(
+  //   //   context: context,
+  //   //   builder: (_) => AlertDialog(
+  //   //     title: const Text("Game Finished"),
+  //   //     content: Text(
+  //   //       "Score: $score\nHigh Score: ${prefs.getInt('highscore')}",
+  //   //     ),
+  //   //     actions: [
+  //   //       TextButton(
+  //   //         onPressed: () {
+  //   //           Navigator.pop(context);
+  //   //           Navigator.pop(context);
+  //   //         },
+  //   //         child: const Text("OK"),
+  //   //       ),
+  //   //     ],
+  //   //   ),
+  //   // );
+  // }
 
   @override
   void dispose() {
