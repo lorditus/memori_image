@@ -234,30 +234,35 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget buildQuiz() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        const SizedBox(height: 20),
+
         Text("Round ${currentRound + 1}/$totalRound"),
         const SizedBox(height: 10),
         Text("Time: $timeLeft"),
         const SizedBox(height: 20),
 
-        GridView.builder(
-          shrinkWrap: true,
-          itemCount: options.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-          ),
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () => selectAnswer(options[index]),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Image.asset(options[index]),
+        Expanded(
+          child: GridView.builder(
+            itemCount: options.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 1,
+            ),
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () => selectAnswer(options[index]),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Image.asset(options[index], fit: BoxFit.contain),
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ],
     );

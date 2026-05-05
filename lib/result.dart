@@ -14,6 +14,8 @@ class _ResultScreenState extends State<ResultScreen> {
   int highScore = 0;
   bool isLoading = true;
 
+  double opacity = 0;
+
   @override
   void initState() {
     super.initState();
@@ -29,12 +31,20 @@ class _ResultScreenState extends State<ResultScreen> {
     setState(() {
       isLoading = false;
     });
+
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      if (mounted) {
+        setState(() {
+          opacity = 1;
+        });
+      }
+    });
   }
 
   String getTitle() {
     if (score == 5) return "Maestro dell'Indovinello (Master of Riddles)";
     if (score == 4) return "Esperto dell'Indovinello (Expert of Riddles)";
-    if (score == 3) return " Abile Indovinatore (Skillful Guesser)";
+    if (score == 3) return "Abile Indovinatore (Skillful Guesser)";
     if (score == 2) return "Principiante dell'Indovinello (Riddle Beginner)";
     if (score == 1) return "Neofita dell'Indovinello (Riddle Novice)";
     return "Sfortunato Indovinatore (Unlucky Guesser)";
@@ -55,88 +65,95 @@ class _ResultScreenState extends State<ResultScreen> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20),
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 600),
+            opacity: opacity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
 
-              Text(
-                getTitle(),
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-              ),
-
-              const SizedBox(height: 20),
-
-              const Text("Score Kamu:", style: TextStyle(fontSize: 18)),
-
-              Text(
-                "$score",
-                style: const TextStyle(
-                  fontSize: 42,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              Text(
-                "High Score: $highScore",
-                style: const TextStyle(fontSize: 18),
-              ),
-
-              const SizedBox(height: 10),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                Text(
+                  getTitle(),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                  child: const Text("Play Again"),
                 ),
-              ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 20),
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const HighScoreScreen(),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                const Text("Score Kamu:", style: TextStyle(fontSize: 18)),
+
+                Text(
+                  "$score",
+                  style: const TextStyle(
+                    fontSize: 42,
+                    fontWeight: FontWeight.bold,
                   ),
-                  child: const Text("Highscore"),
                 ),
-              ),
-              
-              const SizedBox(height: 10),
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text("Main Menu"),
+                const SizedBox(height: 10),
+
+                Text(
+                  "High Score: $highScore",
+                  style: const TextStyle(fontSize: 18),
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 10),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text("Play Again"),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const HighScoreScreen(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text("Highscore"),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text("Main Menu"),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
