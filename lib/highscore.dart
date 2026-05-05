@@ -25,10 +25,7 @@ class _HighScoreScreenState extends State<HighScoreScreen> {
     setState(() {
       top3 = data.map((item) {
         final split = item.split('|');
-        return {
-          'name': split[0],
-          'score': int.parse(split[1]),
-        };
+        return {'name': split[0], 'score': int.parse(split[1])};
       }).toList();
     });
   }
@@ -57,12 +54,11 @@ class _HighScoreScreenState extends State<HighScoreScreen> {
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const Icon(Icons.emoji_events, size: 100, color: Colors.amber),
+
                   const Text(
                     "Top 3 Player",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 20),
@@ -71,11 +67,7 @@ class _HighScoreScreenState extends State<HighScoreScreen> {
                     int index = entry.key;
                     var data = entry.value;
 
-                    return buildItem(
-                      index,
-                      data['name'],
-                      data['score'],
-                    );
+                    return buildItem(index, data['name'], data['score']);
                   }).toList(),
                 ],
               ),

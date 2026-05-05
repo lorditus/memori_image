@@ -58,15 +58,11 @@ class _ResultScreenState extends State<ResultScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
               const SizedBox(height: 20),
 
               Text(
                 getTitle(),
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 20),
@@ -88,7 +84,7 @@ class _ResultScreenState extends State<ResultScreen> {
                 style: const TextStyle(fontSize: 18),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 10),
 
               SizedBox(
                 width: double.infinity,
@@ -108,15 +104,6 @@ class _ResultScreenState extends State<ResultScreen> {
 
               SizedBox(
                 width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Main Menu"),
-                ),
-              ),
-              SizedBox(
-                width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -126,7 +113,27 @@ class _ResultScreenState extends State<ResultScreen> {
                       ),
                     );
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
                   child: const Text("Highscore"),
+                ),
+              ),
+              
+              const SizedBox(height: 10),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text("Main Menu"),
                 ),
               ),
             ],
