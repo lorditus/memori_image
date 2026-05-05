@@ -24,14 +24,40 @@ class _GameScreenState extends State<GameScreen> {
 
   Timer? timer;
 
-  List<String> images = [
-    'assets/earth.png',
-    'assets/earth_2.png',
-    'assets/earth_3.png',
-    'assets/earth_4.png',
+  List<List<String>> categories = [
+    [
+      'assets/earth.png',
+      'assets/earth_2.png',
+      'assets/earth_3.png',
+      'assets/earth_4.png',
+    ],
+    [
+      'assets/car.png',
+      'assets/car_2.png',
+      'assets/car_3.png',
+      'assets/car_4.png',
+    ],
+    [
+      'assets/bottle.png',
+      'assets/bottle_2.png',
+      'assets/bottle_3.png',
+      'assets/bottle_4.png',
+    ],
+    [
+      'assets/rocket.png',
+      'assets/rocket_2.png',
+      'assets/rocket_3.png',
+      'assets/rocket_4.png',
+    ],
+    [
+      'assets/person.png',
+      'assets/person_2.png',
+      'assets/person_3.png',
+      'assets/person_4.png',
+    ],
   ];
 
-  late List<String> sequence;
+  late List<Map<String, dynamic>> sequence;
   late List<String> options;
   late String correctAnswer;
   List<String> leaderboard = [];
@@ -43,10 +69,17 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void startGame() {
-    sequence = List.generate(
-      totalRound,
-      (_) => images[Random().nextInt(images.length)],
-    );
+    final random = Random();
+
+    sequence = List.generate(totalRound, (_) {
+      int categoryIndex = random.nextInt(categories.length);
+
+      List<String> selectedCategory = categories[categoryIndex];
+
+      String answer = selectedCategory[random.nextInt(selectedCategory.length)];
+
+      return {"categoryIndex": categoryIndex, "answer": answer};
+    });
 
     startMemorize();
   }
@@ -70,7 +103,7 @@ class _GameScreenState extends State<GameScreen> {
           t.cancel();
           startQuiz();
         } else {
-          memorizeTimeLeft = 3; // reset untuk gambar berikutnya
+          memorizeTimeLeft = 3;
         }
       }
     });
@@ -88,9 +121,13 @@ class _GameScreenState extends State<GameScreen> {
       return;
     }
 
-    correctAnswer = sequence[currentRound];
+    var current = sequence[currentRound];
 
-    options = List.from(images)..shuffle();
+    correctAnswer = current["answer"];
+
+    List<String> categoryImages = categories[current["categoryIndex"]];
+
+    options = List.from(categoryImages)..shuffle();
 
     timeLeft = 30;
 
@@ -125,68 +162,34 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void endGame() async {
-  timer?.cancel();
+    timer?.cancel();
 
-  final prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
-  String username = prefs.getString('username') ?? "Guest";
+    String username = prefs.getString('username') ?? "Guest";
 
-  List<String> leaderboard = prefs.getStringList('leaderboard') ?? [];
+    List<String> leaderboard = prefs.getStringList('leaderboard') ?? [];
 
-  leaderboard.add("$username|$score");
+    leaderboard.add("$username|$score");
 
-  leaderboard.sort((a, b) {
-    int scoreA = int.parse(a.split('|')[1]);
-    int scoreB = int.parse(b.split('|')[1]);
-    return scoreB.compareTo(scoreA);
-  });
+    leaderboard.sort((a, b) {
+      int scoreA = int.parse(a.split('|')[1]);
+      int scoreB = int.parse(b.split('|')[1]);
+      return scoreB.compareTo(scoreA);
+    });
 
-  if (leaderboard.length > 3) {
-    leaderboard = leaderboard.sublist(0, 3);
+    if (leaderboard.length > 3) {
+      leaderboard = leaderboard.sublist(0, 3);
+    }
+
+    await prefs.setStringList('leaderboard', leaderboard);
+    await prefs.setInt('last_score', score);
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const ResultScreen()),
+    );
   }
-
-  await prefs.setStringList('leaderboard', leaderboard);
-  await prefs.setInt('last_score', score);
-
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (_) => const ResultScreen()),
-  );
-}
-  // void endGame() async {
-  //   timer?.cancel();
-
-  //   final prefs = await SharedPreferences.getInstance();
-
-  //   int highScore = prefs.getInt('highscore') ?? 0;
-
-  //   if (score > highScore) {
-  //     await prefs.setInt('highscore', score);
-  //   }
-  //   await prefs.setInt('last_score', score);
-  //   Navigator.pushReplacement(
-  //     context,
-  //     MaterialPageRoute(builder: (_) => const ResultScreen()),
-  //   );
-  //   // showDialog(
-  //   //   context: context,
-  //   //   builder: (_) => AlertDialog(
-  //   //     title: const Text("Game Finished"),
-  //   //     content: Text(
-  //   //       "Score: $score\nHigh Score: ${prefs.getInt('highscore')}",
-  //   //     ),
-  //   //     actions: [
-  //   //       TextButton(
-  //   //         onPressed: () {
-  //   //           Navigator.pop(context);
-  //   //           Navigator.pop(context);
-  //   //         },
-  //   //         child: const Text("OK"),
-  //   //       ),
-  //   //     ],
-  //   //   ),
-  //   // );
-  // }
 
   @override
   void dispose() {
@@ -224,7 +227,7 @@ class _GameScreenState extends State<GameScreen> {
 
         const SizedBox(height: 20),
 
-        Image.asset(sequence[memorizeIndex], height: 150),
+        Image.asset(sequence[memorizeIndex]["answer"], height: 150),
       ],
     );
   }

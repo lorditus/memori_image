@@ -82,7 +82,6 @@ class _MainScreenState extends State<MainScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.psychology, size: 100, color: Colors.blue),
               const SizedBox(height: 20),
               Text(
                 'Halo, ${widget.username}!',
