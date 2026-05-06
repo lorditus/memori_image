@@ -68,7 +68,7 @@ class _HighScoreScreenState extends State<HighScoreScreen> {
                     var data = entry.value;
 
                     return buildItem(index, data['name'], data['score']);
-                  }),
+                  }).toList(),
                 ],
               ),
       ),
