@@ -25,16 +25,16 @@ class _HighScoreScreenState extends State<HighScoreScreen> {
     setState(() {
       top3 = data.map((item) {
         final split = item.split('|');
-        return {'name': split[0], 'score': int.parse(split[1])};
+        return {'name': split[0], 'score': int.parse(split[1]), 'time_score': int.parse(split[2])};
       }).toList();
     });
   }
 
-  Widget buildItem(int index, String name, int score) {
+  Widget buildItem(int index, String name, int score, int timeScore) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Text(
-        "${index + 1}. $name - $score",
+        "${index + 1}. $name - $score - $timeScore",
         style: const TextStyle(fontSize: 20),
       ),
     );
@@ -67,7 +67,7 @@ class _HighScoreScreenState extends State<HighScoreScreen> {
                     int index = entry.key;
                     var data = entry.value;
 
-                    return buildItem(index, data['name'], data['score']);
+                    return buildItem(index, data['name'], data['score'], data['time_score']);
                   }).toList(),
                 ],
               ),

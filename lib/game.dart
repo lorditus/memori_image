@@ -16,6 +16,7 @@ class _GameScreenState extends State<GameScreen> {
 
   int currentRound = 0;
   int score = 0;
+  int timeScore=0;
   bool isMemorizing = true;
 
   int memorizeIndex = 0;
@@ -151,6 +152,7 @@ class _GameScreenState extends State<GameScreen> {
 
     if (selected == correctAnswer) {
       score += 1;
+      timeScore += timeLeft;
     }
 
     nextQuestion();
@@ -166,15 +168,15 @@ class _GameScreenState extends State<GameScreen> {
 
     final prefs = await SharedPreferences.getInstance();
 
-    String username = prefs.getString('username') ?? "Guest";
+    String username = prefs.getString('username') ?? 'Guest';
 
     List<String> leaderboard = prefs.getStringList('leaderboard') ?? [];
 
-    leaderboard.add("$username|$score");
+    leaderboard.add("$username|$score|$timeScore");
 
     leaderboard.sort((a, b) {
-      int scoreA = int.parse(a.split('|')[1]);
-      int scoreB = int.parse(b.split('|')[1]);
+      int scoreA = int.parse(a.split('|')[2]);
+      int scoreB = int.parse(b.split('|')[2]);
       return scoreB.compareTo(scoreA);
     });
 
@@ -184,7 +186,7 @@ class _GameScreenState extends State<GameScreen> {
 
     await prefs.setStringList('leaderboard', leaderboard);
     await prefs.setInt('last_score', score);
-
+    await prefs.setInt('time_score', timeScore);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const ResultScreen()),

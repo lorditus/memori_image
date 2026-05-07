@@ -13,6 +13,7 @@ class _ResultScreenState extends State<ResultScreen> {
   int score = 0;
   int highScore = 0;
   bool isLoading = true;
+  int timeScore = 0;
 
   double opacity = 0;
 
@@ -27,6 +28,7 @@ class _ResultScreenState extends State<ResultScreen> {
 
     score = prefs.getInt('last_score') ?? 0;
     highScore = prefs.getInt('highscore') ?? 0;
+    timeScore = prefs.getInt('time_score') ?? 0;
 
     setState(() {
       isLoading = false;
@@ -93,11 +95,16 @@ class _ResultScreenState extends State<ResultScreen> {
                   ),
                 ),
 
+                const Text("Time Score:", style: TextStyle(fontSize: 18)),
+
                 const SizedBox(height: 10),
 
                 Text(
-                  "High Score: $highScore",
-                  style: const TextStyle(fontSize: 18),
+                  "$timeScore",
+                  style: const TextStyle(
+                    fontSize: 42,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
 
                 const SizedBox(height: 10),
